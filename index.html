@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Mixer 🧪 | 상상을 가격으로 만드는 주식 레시피 연구소</title>
+  <!-- Google Fonts: Outfit (English) & Noto Sans KR (Korean) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css?v=1.1">
+</head>
+<body>
+  <div class="phone-frame">
+    <!-- Phone Status Bar -->
+    <div class="phone-status-bar">
+      <div class="status-left">09:41</div>
+      <div class="status-right">
+        <span>📶</span>
+        <span>🛜</span>
+        <span>🔋 100%</span>
+      </div>
+    </div>
+
+    <!-- App Container -->
+    <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <span class="logo-emoji">🧪</span>
+        <div class="logo-text">
+          <h1>Stock Mixer</h1>
+          <p class="tagline">상상을 가격으로 섞는 주식 레시피 연구소</p>
+        </div>
+      </div>
+      
+      <!-- Search & Filters -->
+      <div class="header-controls">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="stock-search" placeholder="종목 검색 (예: 삼성전자, 네이버)..." autocomplete="off">
+          <div class="search-suggestions" id="search-suggestions"></div>
+        </div>
+        <button id="btn-open-guide" class="btn-secondary">🧪 도구 설명서</button>
+        <button id="btn-open-rankings" class="btn-secondary">🏆 명예의 전당</button>
+      </div>
+    </header>
+
+    <!-- App Navigation Tabs -->
+    <nav class="app-tabs">
+      <button class="tab-btn active" data-tab="mixer-tab">🧪 레시피 믹서</button>
+      <button class="tab-btn" data-tab="ranking-tab">🏆 시총 150 랭킹전</button>
+    </nav>
+
+    <!-- TAB 1: Mixer View -->
+    <div id="mixer-tab" class="tab-content active">
+      <!-- Quick Stock Selection Chips -->
+      <section class="chips-section">
+        <span class="chips-title">🔥 추천 재료 :</span>
+        <div class="chips-container" id="chips-container">
+          <!-- Javascript will inject stock chips here -->
+        </div>
+      </section>
+
+      <!-- Main Content Area -->
+      <main class="app-main">
+        
+        <!-- LEFT COLUMN: Mixer Inputs -->
+        <section class="mixer-inputs-panel">
+          
+          <!-- Active Stock Card -->
+          <div class="card active-stock-card" id="stock-display-card">
+            <div class="card-glow"></div>
+            <div class="card-header">
+              <span class="stock-ticker-badge" id="display-ticker">005930</span>
+              <span class="stock-tagline" id="display-tagline">반도체와 전자 부문의 거인</span>
+            </div>
+            <div class="card-body">
+              <h2 class="stock-name" id="display-name">삼성전자</h2>
+              <div class="price-display">
+                <span class="price-label">현재 주가</span>
+                <span class="price-value" id="display-price">75,000</span><span class="currency">원</span>
+              </div>
+              <p class="stock-desc" id="display-desc">글로벌 1위 메모리 반도체 및 스마트폰 제조사</p>
+            </div>
+            <div class="card-footer">
+              <div class="footer-stat">
+                <span>기존 이익률</span>
+                <strong id="display-stat-opm">12%</strong>
+              </div>
+              <div class="footer-stat">
+                <span>기존 PER</span>
+                <strong id="display-stat-per">15배</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mixer Control Sliders -->
+          <div class="mixer-controls-card">
+            <div class="section-title">
+              <h3>🎛️ 레시피 재료 믹싱</h3>
+              <button class="btn-text" id="btn-reset-sliders">초기화 ↺</button>
+            </div>
+
+            <!-- Slider 1: Revenue Growth -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <label for="slider-growth">
+                  <span class="ingredient-color-dot" style="background-color: var(--neon-mint);"></span>
+                  매출액 성장률 (1년 뒤)
+                </label>
+                <div class="slider-value-badge mint-glow" id="val-growth">0%</div>
+              </div>
+              <input type="range" id="slider-growth" min="-50" max="100" value="0" step="1">
+              <div class="slider-ticks">
+                <span>역성장 (-50%)</span>
+                <span>유지 (0%)</span>
+                <span>2배 폭발 (+100%)</span>
+              </div>
+            </div>
+
+            <!-- Slider 2: Operating Profit Margin -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <label for="slider-opm">
+                  <span class="ingredient-color-dot" style="background-color: var(--neon-pink);"></span>
+                  영업이익률 (마진)
+                </label>
+                <div class="slider-value-badge pink-glow" id="val-opm">12%</div>
+              </div>
+              <input type="range" id="slider-opm" min="1" max="50" value="12" step="0.5">
+              <div class="slider-ticks">
+                <span>박리다매 (1%)</span>
+                <span>제조업 평균 (10%)</span>
+                <span>빅테크 마진 (50%)</span>
+              </div>
+            </div>
+
+            <!-- Slider 3: PER Multiple -->
+            <div class="slider-group">
+              <div class="slider-header">
+                <label for="slider-per">
+                  <span class="ingredient-color-dot" style="background-color: var(--neon-purple);"></span>
+                  PER 배수 (시장 가치)
+                </label>
+                <div class="slider-value-badge purple-glow" id="val-per">15배</div>
+              </div>
+              <input type="range" id="slider-per" min="1" max="100" value="15" step="0.5">
+              <div class="slider-ticks">
+                <span>저평가/사양 (1배)</span>
+                <span>평균 (15배)</span>
+                <span>꿈과 희망 (100배)</span>
+              </div>
+            </div>
+
+            <!-- DCF Presets -->
+            <div class="presets-section">
+              <h4>📈 DCF 가치 평가 버튼 모드</h4>
+              <div class="presets-grid">
+                <button class="btn-preset btn-preset-dcf" data-preset="conservative">📉 보수적 예측</button>
+                <button class="btn-preset btn-preset-dcf" data-preset="normal">😐 중립적 예측</button>
+                <button class="btn-preset btn-preset-dcf" data-preset="optimistic">🚀 낙관적 예측</button>
+              </div>
+            </div>
+
+            <!-- Scenario Presets -->
+            <div class="presets-section">
+              <h4>🔮 상상 시나리오 시뮬레이터</h4>
+              <div class="presets-grid">
+                <button class="btn-preset btn-preset-scenario" data-scenario="boom">🔥 초호황 사이클</button>
+                <button class="btn-preset btn-preset-scenario" data-scenario="ai">🧠 AI 혁명 통합</button>
+                <button class="btn-preset btn-preset-scenario" data-scenario="recession">🌧️ 글로벌 대불황</button>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- RIGHT COLUMN: Mixer Lab & Outputs -->
+        <section class="mixer-outputs-panel">
+          
+          <!-- Lab Beaker Visualization -->
+          <div class="beaker-card">
+            <div class="beaker-container">
+              <div class="beaker-bubble-tip">마우스를 올리거나 슬라이더를 흔들어보세요!</div>
+              <canvas id="beaker-canvas"></canvas>
+              <div class="beaker-stats">
+                <span id="beaker-status-label">재료 혼합 중...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-time Output Board -->
+          <div class="output-board-card">
+            <h3 class="panel-subtitle">🧪 믹싱 결과 보고서</h3>
+            
+            <div class="output-grid">
+              <div class="output-item">
+                <span class="output-label">예상 매출액</span>
+                <strong class="output-value" id="out-revenue">0원</strong>
+                <span class="output-change-badge" id="out-revenue-pct">+0%</span>
+              </div>
+              
+              <div class="output-item">
+                <span class="output-label">예상 영업이익</span>
+                <strong class="output-value" id="out-profit">0원</strong>
+                <span class="output-change-badge" id="out-profit-pct">+0%</span>
+              </div>
+
+              <div class="output-item">
+                <span class="output-label">적정 시가총액</span>
+                <strong class="output-value" id="out-marketcap">0원</strong>
+              </div>
+
+              <div class="output-item target-price-item">
+                <span class="output-label">적정 주가</span>
+                <div class="price-value-container">
+                  <strong class="output-value highlight-neon" id="out-target-price">0</strong>
+                  <span class="currency-highlight">원</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Valuation Comparison Panel -->
+            <div class="valuation-panel" id="valuation-panel">
+              <div class="valuation-header">
+                <div class="valuation-result-badge" id="val-result-badge">😐 적정</div>
+                <div class="roi-badge" id="val-roi-badge">+0.0%</div>
+              </div>
+              <div class="valuation-body">
+                <p class="valuation-msg" id="val-msg">내가 만든 가격과 현재가가 거의 동일합니다.</p>
+              </div>
+            </div>
+
+            <!-- Sharing & Actions -->
+            <div class="action-buttons-group">
+              <button class="btn-primary" id="btn-share-recipe">📋 레시피 복사하기</button>
+              <button class="btn-accent" id="btn-try-game">🎮 챌린지 퀴즈 게임</button>
+            </div>
+
+          </div>
+
+        </section>
+
+      </main>
+    </div>
+
+    <!-- TAB 2: Ranking Battle View -->
+    <div id="ranking-tab" class="tab-content">
+      <div class="ranking-layout">
+        
+        <!-- LEFT COLUMN: Top 150 Ranking List -->
+        <section class="ranking-list-panel">
+          <div class="card ranking-card">
+            <div class="ranking-card-header">
+              <h3 class="panel-title">🏆 국내 주식 시가총액 Top 150 랭킹전</h3>
+              <div class="table-filters">
+                <div class="filter-group-search">
+                  <span class="search-icon">🔍</span>
+                  <input type="text" id="ranking-search" placeholder="종목명 또는 코드 검색...">
+                </div>
+                <div class="filter-group-select">
+                  <select id="ranking-sector-filter">
+                    <option value="all">전체 업종</option>
+                    <option value="반도체">반도체</option>
+                    <option value="IT/인터넷">IT/인터넷</option>
+                    <option value="2차전지">2차전지</option>
+                    <option value="자동차">자동차</option>
+                    <option value="제약/바이오">제약/바이오</option>
+                    <option value="금융/은행">금융/은행</option>
+                    <option value="철강/소재">철강/소재</option>
+                    <option value="화학/소재">화학/소재</option>
+                    <option value="유통/상사/건설">유통/상사/건설</option>
+                    <option value="보험">보험</option>
+                    <option value="엔터테인먼트">엔터테인먼트</option>
+                    <option value="기타">기타</option>
+                  </select>
+                </div>
+                <div class="market-selector">
+                  <button class="market-btn active" data-market="all">전체</button>
+                  <button class="market-btn" data-market="KOSPI">코스피</button>
+                  <button class="market-btn" data-market="KOSDAQ">코스닥</button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="ranking-table-container">
+              <table class="ranking-table">
+                <thead>
+                  <tr>
+                    <th>순위</th>
+                    <th>종목명 (코드)</th>
+                    <th>업종</th>
+                    <th class="text-right">실시간 현재가</th>
+                    <th class="text-right">등락률</th>
+                    <th class="text-right">시가총액</th>
+                    <th class="text-center">액션</th>
+                  </tr>
+                </thead>
+                <tbody id="ranking-table-body">
+                  <!-- JS will dynamically inject rows and the virtual battle stock -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Pagination -->
+            <div class="table-pagination">
+              <button class="btn-pagination" id="btn-prev-page">이전</button>
+              <span id="page-indicator">페이지 1 / 3</span>
+              <button class="btn-pagination" id="btn-next-page">다음</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT COLUMN: Control Panel & Virtual Battle Dashboard -->
+        <section class="ranking-control-panel">
+          
+          <!-- Virtual Battle Report Card -->
+          <div class="card battle-report-card">
+            <div class="card-glow-battle"></div>
+            <h3 class="panel-subtitle">🥊 레시피 가상 랭킹 배틀</h3>
+            <div class="battle-stats-container">
+              <div class="battle-stat-item">
+                <span class="battle-label">현재 나의 레시피 순위</span>
+                <strong class="battle-value highlight-gold" id="battle-rank">#-- 위</strong>
+              </div>
+              <div class="battle-stat-item">
+                <span class="battle-label">나의 레시피 적정 시총</span>
+                <strong class="battle-value" id="battle-mcap">0원</strong>
+              </div>
+            </div>
+            <div class="battle-comparison-card" id="battle-rival-card">
+              <div class="battle-rival-title">⚔️ 경쟁 상대 분석</div>
+              <p class="battle-msg" id="battle-comparison-text">
+                왼쪽 탭에서 슬라이더를 조작해 레시피를 완성하면, 가상 시가총액이 계산되어 150대 기업 순위에 실시간 등재됩니다!
+              </p>
+            </div>
+          </div>
+
+          <!-- Kiwoom OpenAPI Connection Settings -->
+          <div class="card kiwoom-config-card">
+            <h3 class="panel-subtitle">⚡ 키움증권 OpenAPI 연동 설정</h3>
+            
+            <div class="api-mode-selector">
+              <label class="mode-label">
+                <input type="radio" name="api-mode" value="simulation" checked>
+                <span>🛠️ 실시간 시뮬레이션 모드</span>
+              </label>
+              <label class="mode-label">
+                <input type="radio" name="api-mode" value="kiwoom">
+                <span>🔑 키움 OpenAPI 연동 모드</span>
+              </label>
+            </div>
+
+            <div class="connection-status-area">
+              <span class="status-dot status-sim" id="conn-status-dot"></span>
+              <span class="status-text" id="conn-status-text">시뮬레이션 모드 활성화 중 (Live 가격 변동)</span>
+            </div>
+
+            <div class="kiwoom-inputs" id="kiwoom-inputs-section" style="display: none;">
+              <div class="input-field">
+                <label for="kiwoom-app-key">App Key (Client ID)</label>
+                <input type="password" id="kiwoom-app-key" placeholder="키움증권 App Key 입력...">
+              </div>
+              <div class="input-field">
+                <label for="kiwoom-secret-key">Secret Key (Client Secret)</label>
+                <input type="password" id="kiwoom-secret-key" placeholder="키움증권 Secret Key 입력...">
+              </div>
+              <div class="input-field">
+                <label for="kiwoom-proxy">CORS Proxy URL</label>
+                <input type="text" id="kiwoom-proxy" value="https://cors-anywhere.herokuapp.com/" placeholder="프록시 서버 주소 입력...">
+                <p class="input-desc">브라우저 CORS 차단을 우회하기 위한 프록시입니다. (비워둘 시 직접 호출)</p>
+              </div>
+              
+              <button class="btn-primary btn-full" id="btn-connect-kiwoom">키움 API 서버 연결하기 🔌</button>
+
+              <div class="developer-tip">
+                <h4>💡 CORS 해결 가이드</h4>
+                <p>로컬 웹 브라우저에서 키움 API 호출 시 CORS 보안 에러가 발생합니다. 원활한 연동을 위해 다음을 추천합니다:</p>
+                <ul>
+                  <li>1. `cors-anywhere` 등의 프록시 주소 설정</li>
+                  <li>2. Chrome 실행 시 `--disable-web-security` 옵션 추가</li>
+                  <li>3. 로컬 프록시 서버 실행 (`npx cors-anywhere`) 후 해당 주소 입력</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Simulation Controls -->
+            <div class="simulation-controls" id="sim-controls-section">
+              <div class="sim-speed-control">
+                <label>시뮬레이션 갱신 속도</label>
+                <div class="sim-speed-badge" id="sim-speed-badge">1.5초</div>
+                <input type="range" id="sim-speed-range" min="500" max="5000" value="1500" step="500">
+              </div>
+              <div class="sim-buttons">
+                <button class="btn-secondary" id="btn-toggle-sim">⏸️ 일시 정지</button>
+                <button class="btn-text" id="btn-reset-sim">시세 초기화 ↺</button>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+    </div> class="valuation-result-badge" id="val-result-badge">😐 적정</div>
+              <div class="roi-badge" id="val-roi-badge">+0.0%</div>
+            </div>
+            <div class="valuation-body">
+              <p class="valuation-msg" id="val-msg">내가 만든 가격과 현재가가 거의 동일합니다.</p>
+            </div>
+          </div>
+
+          <!-- Sharing & Actions -->
+          <div class="action-buttons-group">
+            <button class="btn-primary" id="btn-share-recipe">📋 레시피 복사하기</button>
+            <button class="btn-accent" id="btn-try-game">🎮 챌린지 퀴즈 게임</button>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer-info">
+      <p>© 2026 Stock Mixer Labs. 모든 데이터 처리는 PC 로컬 메모리 내에서 안전하게 구동됩니다.</p>
+    </footer>
+
+  </div>
+
+  <!-- MODAL: Help Guide -->
+  <div class="modal-overlay" id="guide-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="btn-close-guide">×</button>
+      <h2 class="modal-title">🧪 Stock Mixer 사용법 및 용어 사전</h2>
+      <div class="modal-body">
+        
+        <h3>1. 믹싱 레시피 작동 원리</h3>
+        <p>Stock Mixer는 복잡한 가치 평가 수식을 직관적인 3가지 재료로 축약하여, 사용자가 기업의 미래 성장성을 직접 시뮬레이션해볼 수 있는 시각 시뮬레이터입니다.</p>
+        
+        <div class="concept-card">
+          <h4>🧮 핵심 믹서 공식</h4>
+          <ul>
+            <li><strong>예상 매출액</strong> = 현재 매출액 × (1 + 매출액 성장률)</li>
+            <li><strong>예상 영업이익</strong> = 예상 매출액 × 영업이익률</li>
+            <li><strong>적정 시가총액</strong> = 예상 영업이익 × PER 배수</li>
+            <li><strong>적정 주가</strong> = 적정 시가총액 ÷ 총 발행주식수</li>
+          </ul>
+          <p class="caution-text">* 초보자의 직관적 이해를 위해 당기순이익 대신 영업이익을 기준으로 PER를 계산하는 약식 수식을 사용합니다.</p>
+        </div>
+
+        <h3>2. 3대 재료 설명</h3>
+        <div class="definitions-grid">
+          <div class="definition-item">
+            <div class="def-title">
+              <span class="ingredient-color-dot" style="background-color: var(--neon-mint);"></span>
+              매출액 성장률 (Revenue Growth)
+            </div>
+            <p>회사의 덩치가 얼마나 커질 것인가에 대한 지표입니다. 신제품 대박, 해외 진출 성공 시 성장률이 크게 튑니다.</p>
+          </div>
+          <div class="definition-item">
+            <div class="def-title">
+              <span class="ingredient-color-dot" style="background-color: var(--neon-pink);"></span>
+              영업이익률 (Profit Margin)
+            </div>
+            <p>매출액 중 순수하게 남긴 마진의 비율입니다. 제조업은 대략 5~15% 수준이지만, 소프트웨어나 플랫폼 기업은 30~50%의 높은 마진을 남기기도 합니다.</p>
+          </div>
+          <div class="definition-item">
+            <div class="def-title">
+              <span class="ingredient-color-dot" style="background-color: var(--neon-purple);"></span>
+              PER 배수 (Price-to-Earnings Ratio)
+            </div>
+            <p>이 회사가 버는 돈의 몇 배로 시가총액을 쳐줄 것인가 하는 시장의 '인기 투표' 점수입니다. 고성장 바이오/테크는 50~100배를 받기도 하고, 사양 산업은 5배 미만을 받기도 합니다.</p>
+          </div>
+        </div>
+
+        <h3>3. 판정 기준</h3>
+        <ul>
+          <li><strong>🔥 싸다 (저평가)</strong>: 내가 섞은 적정주가가 현재 주가보다 15% 이상 높을 때. (황금빛 럭셔리 카드 활성화!)</li>
+          <li><strong>😐 적정 (유지)</strong>: 내가 섞은 적정주가와 현재 주가의 차이가 ±15% 내외일 때.</li>
+          <li><strong>💀 비싸다 (고평가)</strong>: 내가 섞은 적정주가가 현재 주가보다 15% 이상 낮을 때. (어두운 회색조 카드 활성화!)</li>
+        </ul>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Hall of Fame (Rankings & Game Challenge) -->
+  <div class="modal-overlay" id="rankings-modal">
+    <div class="modal-content">
+      <button class="modal-close" id="btn-close-rankings">×</button>
+      <h2 class="modal-title">🏆 적정 주가 예측 챌린지 퀴즈</h2>
+      <div class="modal-body">
+        
+        <div class="game-container" id="game-container">
+          <!-- Game Start View -->
+          <div id="game-start-view" class="game-view active">
+            <p class="game-intro">랜덤으로 출제되는 기업의 실제 현재 마진과 시가총액 비율을 고려하여, 시장이 부여한 **실제 PER**을 알아맞혀보세요! 오차가 적을수록 높은 점수를 획득합니다.</p>
+            <div class="game-rules">
+              <h4>🎮 게임 규칙</h4>
+              <ul>
+                <li>총 3문제가 출제됩니다.</li>
+                <li>기업 정보를 보고 적정하다고 생각하는 PER 슬라이더를 조작해 정답을 외칩니다.</li>
+                <li>실제 주가(시가총액)에 매겨진 실시간 PER와의 격차에 따라 점수가 산정됩니다!</li>
+              </ul>
+            </div>
+            <button class="btn-accent btn-large" id="btn-start-game">챌린지 도전하기 🚀</button>
+          </div>
+
+          <!-- Game Play View -->
+          <div id="game-play-view" class="game-view">
+            <div class="game-progress">
+              <span id="game-step">문제 1 / 3</span>
+              <span id="game-score">점수: 0점</span>
+            </div>
+            
+            <div class="game-question-card">
+              <h3 id="q-stock-name">네이버</h3>
+              <p id="q-stock-desc">포털 및 쇼핑 등 플랫폼 서비스 제공사</p>
+              
+              <div class="q-stats-grid">
+                <div class="q-stat">
+                  <span>현재 주가</span>
+                  <strong id="q-stock-price">180,000원</strong>
+                </div>
+                <div class="q-stat">
+                  <span>매출액</span>
+                  <strong id="q-stock-revenue">9.6조 원</strong>
+                </div>
+                <div class="q-stat">
+                  <span>영업이익률</span>
+                  <strong id="q-stock-opm">15%</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="game-input-area">
+              <div class="game-input-header">
+                <label>이 회사의 실제 PER는 몇 배일까요?</label>
+                <div class="game-input-val" id="game-per-val">20배</div>
+              </div>
+              <input type="range" id="game-slider-per" min="1" max="80" value="20" step="1">
+            </div>
+
+            <button class="btn-primary btn-large" id="btn-submit-answer">정답 제출 🎯</button>
+          </div>
+
+          <!-- Game Result View -->
+          <div id="game-result-view" class="game-view">
+            <div class="game-result-header">
+              <span class="trophy-emoji">🏆</span>
+              <h2>챌린지 완료!</h2>
+              <h3 id="final-score-text">최종 점수: 250점</h3>
+            </div>
+            
+            <div class="score-evaluation" id="score-evaluation">
+              훌륭합니다! 주식 가치 평가에 대한 감이 아주 뛰어납니다.
+            </div>
+
+            <div class="ranking-leaderboard">
+              <h4>🔥 실시간 랭킹 (로컬)</h4>
+              <ol class="ranking-list" id="local-rankings-list">
+                <li><span>1. 가치투자달인</span> <strong>290점</strong></li>
+                <li><span>2. 여의도워렌버핏</span> <strong>275점</strong></li>
+                <li><span>3. 삼전주주</span> <strong>240점</strong></li>
+              </ol>
+            </div>
+
+            <div class="game-action-buttons">
+              <button class="btn-accent" id="btn-replay-game">다시 도전 🔄</button>
+              <button class="btn-secondary" id="btn-exit-game">로비로 이동</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">레시피가 클립보드에 성공적으로 복사되었습니다! 🧪</div>
+
+    <!-- Phone Home Indicator -->
+    <div class="phone-home-indicator"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
