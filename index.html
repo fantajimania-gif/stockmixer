@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css?v=1.1">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
   <div class="phone-frame">
@@ -32,7 +32,7 @@
         <span class="logo-emoji">🧪</span>
         <div class="logo-text">
           <h1>Stock Mixer</h1>
-          <p class="tagline">상상을 가격으로 섞는 주식 레시피 연구소</p>
+          <p class="tagline">상상을 주가로 시뮬레이션하는 주식 레시피</p>
         </div>
       </div>
       
@@ -43,26 +43,17 @@
           <input type="text" id="stock-search" placeholder="종목 검색 (예: 삼성전자, 네이버)..." autocomplete="off">
           <div class="search-suggestions" id="search-suggestions"></div>
         </div>
-        <button id="btn-open-guide" class="btn-secondary">🧪 도구 설명서</button>
-        <button id="btn-open-rankings" class="btn-secondary">🏆 명예의 전당</button>
+        <!-- Kiwoom API 연동 상태 버튼 -->
+        <button id="btn-kiwoom-status" class="btn-kiwoom-status disconnected" title="Kiwoom API 연동 설정">
+          <span class="kiwoom-status-dot"></span>
+          <span class="kiwoom-status-label">미연결</span>
+        </button>
+        <button id="btn-open-guide" class="btn-help-icon" title="도움말">❔</button>
       </div>
     </header>
 
-    <!-- App Navigation Tabs -->
-    <nav class="app-tabs">
-      <button class="tab-btn active" data-tab="mixer-tab">🧪 레시피 믹서</button>
-      <button class="tab-btn" data-tab="ranking-tab">🏆 시총 150 랭킹전</button>
-    </nav>
-
     <!-- TAB 1: Mixer View -->
     <div id="mixer-tab" class="tab-content active">
-      <!-- Quick Stock Selection Chips -->
-      <section class="chips-section">
-        <span class="chips-title">🔥 추천 재료 :</span>
-        <div class="chips-container" id="chips-container">
-          <!-- Javascript will inject stock chips here -->
-        </div>
-      </section>
 
       <!-- Main Content Area -->
       <main class="app-main">
@@ -155,9 +146,18 @@
               </div>
             </div>
 
+          </div>
+
+        </section>
+
+        <!-- RIGHT COLUMN: Mixer Lab & Outputs -->
+        <section class="mixer-outputs-panel">
+          
+          <!-- 가치 평가 & 시나리오 프리셋 -->
+          <div class="card presets-card">
             <!-- DCF Presets -->
             <div class="presets-section">
-              <h4>📈 DCF 가치 평가 버튼 모드</h4>
+              <h4>📈 가치 평가 프리셋</h4>
               <div class="presets-grid">
                 <button class="btn-preset btn-preset-dcf" data-preset="conservative">📉 보수적 예측</button>
                 <button class="btn-preset btn-preset-dcf" data-preset="normal">😐 중립적 예측</button>
@@ -167,28 +167,11 @@
 
             <!-- Scenario Presets -->
             <div class="presets-section">
-              <h4>🔮 상상 시나리오 시뮬레이터</h4>
+              <h4>🔮 시나리오 프리셋</h4>
               <div class="presets-grid">
                 <button class="btn-preset btn-preset-scenario" data-scenario="boom">🔥 초호황 사이클</button>
                 <button class="btn-preset btn-preset-scenario" data-scenario="ai">🧠 AI 혁명 통합</button>
                 <button class="btn-preset btn-preset-scenario" data-scenario="recession">🌧️ 글로벌 대불황</button>
-              </div>
-            </div>
-
-          </div>
-
-        </section>
-
-        <!-- RIGHT COLUMN: Mixer Lab & Outputs -->
-        <section class="mixer-outputs-panel">
-          
-          <!-- Lab Beaker Visualization -->
-          <div class="beaker-card">
-            <div class="beaker-container">
-              <div class="beaker-bubble-tip">마우스를 올리거나 슬라이더를 흔들어보세요!</div>
-              <canvas id="beaker-canvas"></canvas>
-              <div class="beaker-stats">
-                <span id="beaker-status-label">재료 혼합 중...</span>
               </div>
             </div>
           </div>
@@ -237,10 +220,18 @@
 
             <!-- Sharing & Actions -->
             <div class="action-buttons-group">
-              <button class="btn-primary" id="btn-share-recipe">📋 레시피 복사하기</button>
-              <button class="btn-accent" id="btn-try-game">🎮 챌린지 퀴즈 게임</button>
+              <button class="btn-primary btn-full" id="btn-share-recipe">📋 레시피 복사하기</button>
+              <button class="btn-accent btn-full" id="btn-save-recipe">💾 레시피 저장하기</button>
             </div>
 
+          </div>
+
+          <!-- 저장된 레시피 카드 -->
+          <div class="card saved-recipes-card" id="saved-recipes-card" style="margin-top: 20px;">
+            <h3 class="panel-subtitle">📂 저장된 레시피 목록</h3>
+            <div id="saved-recipes-list" class="saved-recipes-list">
+              <p class="empty-msg" style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 20px 0;">저장된 레시피가 없습니다.</p>
+            </div>
           </div>
 
         </section>
@@ -248,189 +239,170 @@
       </main>
     </div>
 
-    <!-- TAB 2: Ranking Battle View -->
+    <!-- TAB 2: Ranking Battle View — 시총 150 랭킹전 (전면 개편) -->
     <div id="ranking-tab" class="tab-content">
-      <div class="ranking-layout">
-        
-        <!-- LEFT COLUMN: Top 150 Ranking List -->
-        <section class="ranking-list-panel">
-          <div class="card ranking-card">
-            <div class="ranking-card-header">
-              <h3 class="panel-title">🏆 국내 주식 시가총액 Top 150 랭킹전</h3>
-              <div class="table-filters">
-                <div class="filter-group-search">
-                  <span class="search-icon">🔍</span>
-                  <input type="text" id="ranking-search" placeholder="종목명 또는 코드 검색...">
-                </div>
-                <div class="filter-group-select">
-                  <select id="ranking-sector-filter">
-                    <option value="all">전체 업종</option>
-                    <option value="반도체">반도체</option>
-                    <option value="IT/인터넷">IT/인터넷</option>
-                    <option value="2차전지">2차전지</option>
-                    <option value="자동차">자동차</option>
-                    <option value="제약/바이오">제약/바이오</option>
-                    <option value="금융/은행">금융/은행</option>
-                    <option value="철강/소재">철강/소재</option>
-                    <option value="화학/소재">화학/소재</option>
-                    <option value="유통/상사/건설">유통/상사/건설</option>
-                    <option value="보험">보험</option>
-                    <option value="엔터테인먼트">엔터테인먼트</option>
-                    <option value="기타">기타</option>
-                  </select>
-                </div>
-                <div class="market-selector">
-                  <button class="market-btn active" data-market="all">전체</button>
-                  <button class="market-btn" data-market="KOSPI">코스피</button>
-                  <button class="market-btn" data-market="KOSDAQ">코스닥</button>
-                </div>
-              </div>
-            </div>
-            
-            <div class="ranking-table-container">
-              <table class="ranking-table">
-                <thead>
-                  <tr>
-                    <th>순위</th>
-                    <th>종목명 (코드)</th>
-                    <th>업종</th>
-                    <th class="text-right">실시간 현재가</th>
-                    <th class="text-right">등락률</th>
-                    <th class="text-right">시가총액</th>
-                    <th class="text-center">액션</th>
-                  </tr>
-                </thead>
-                <tbody id="ranking-table-body">
-                  <!-- JS will dynamically inject rows and the virtual battle stock -->
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Table Pagination -->
-            <div class="table-pagination">
-              <button class="btn-pagination" id="btn-prev-page">이전</button>
-              <span id="page-indicator">페이지 1 / 3</span>
-              <button class="btn-pagination" id="btn-next-page">다음</button>
-            </div>
+      
+      <!-- 랭킹 헤더 + 필터 바 -->
+      <div class="ranking-header-bar">
+        <div class="ranking-title-area">
+          <span class="ranking-crown">👑</span>
+          <div>
+            <h2 class="ranking-main-title">시총 Top 150 랭킹전</h2>
+            <p class="ranking-sub-title">실시간 시가총액 기준 · 회사를 골라 가치평가를 시작하세요</p>
           </div>
-        </section>
-
-        <!-- RIGHT COLUMN: Control Panel & Virtual Battle Dashboard -->
-        <section class="ranking-control-panel">
-          
-          <!-- Virtual Battle Report Card -->
-          <div class="card battle-report-card">
-            <div class="card-glow-battle"></div>
-            <h3 class="panel-subtitle">🥊 레시피 가상 랭킹 배틀</h3>
-            <div class="battle-stats-container">
-              <div class="battle-stat-item">
-                <span class="battle-label">현재 나의 레시피 순위</span>
-                <strong class="battle-value highlight-gold" id="battle-rank">#-- 위</strong>
-              </div>
-              <div class="battle-stat-item">
-                <span class="battle-label">나의 레시피 적정 시총</span>
-                <strong class="battle-value" id="battle-mcap">0원</strong>
-              </div>
-            </div>
-            <div class="battle-comparison-card" id="battle-rival-card">
-              <div class="battle-rival-title">⚔️ 경쟁 상대 분석</div>
-              <p class="battle-msg" id="battle-comparison-text">
-                왼쪽 탭에서 슬라이더를 조작해 레시피를 완성하면, 가상 시가총액이 계산되어 150대 기업 순위에 실시간 등재됩니다!
-              </p>
-            </div>
-          </div>
-
-          <!-- Kiwoom OpenAPI Connection Settings -->
-          <div class="card kiwoom-config-card">
-            <h3 class="panel-subtitle">⚡ 키움증권 OpenAPI 연동 설정</h3>
-            
-            <div class="api-mode-selector">
-              <label class="mode-label">
-                <input type="radio" name="api-mode" value="simulation" checked>
-                <span>🛠️ 실시간 시뮬레이션 모드</span>
-              </label>
-              <label class="mode-label">
-                <input type="radio" name="api-mode" value="kiwoom">
-                <span>🔑 키움 OpenAPI 연동 모드</span>
-              </label>
-            </div>
-
-            <div class="connection-status-area">
-              <span class="status-dot status-sim" id="conn-status-dot"></span>
-              <span class="status-text" id="conn-status-text">시뮬레이션 모드 활성화 중 (Live 가격 변동)</span>
-            </div>
-
-            <div class="kiwoom-inputs" id="kiwoom-inputs-section" style="display: none;">
-              <div class="input-field">
-                <label for="kiwoom-app-key">App Key (Client ID)</label>
-                <input type="password" id="kiwoom-app-key" placeholder="키움증권 App Key 입력...">
-              </div>
-              <div class="input-field">
-                <label for="kiwoom-secret-key">Secret Key (Client Secret)</label>
-                <input type="password" id="kiwoom-secret-key" placeholder="키움증권 Secret Key 입력...">
-              </div>
-              <div class="input-field">
-                <label for="kiwoom-proxy">CORS Proxy URL</label>
-                <input type="text" id="kiwoom-proxy" value="https://cors-anywhere.herokuapp.com/" placeholder="프록시 서버 주소 입력...">
-                <p class="input-desc">브라우저 CORS 차단을 우회하기 위한 프록시입니다. (비워둘 시 직접 호출)</p>
-              </div>
-              
-              <button class="btn-primary btn-full" id="btn-connect-kiwoom">키움 API 서버 연결하기 🔌</button>
-
-              <div class="developer-tip">
-                <h4>💡 CORS 해결 가이드</h4>
-                <p>로컬 웹 브라우저에서 키움 API 호출 시 CORS 보안 에러가 발생합니다. 원활한 연동을 위해 다음을 추천합니다:</p>
-                <ul>
-                  <li>1. `cors-anywhere` 등의 프록시 주소 설정</li>
-                  <li>2. Chrome 실행 시 `--disable-web-security` 옵션 추가</li>
-                  <li>3. 로컬 프록시 서버 실행 (`npx cors-anywhere`) 후 해당 주소 입력</li>
-                </ul>
-              </div>
-            </div>
-
-            <!-- Simulation Controls -->
-            <div class="simulation-controls" id="sim-controls-section">
-              <div class="sim-speed-control">
-                <label>시뮬레이션 갱신 속도</label>
-                <div class="sim-speed-badge" id="sim-speed-badge">1.5초</div>
-                <input type="range" id="sim-speed-range" min="500" max="5000" value="1500" step="500">
-              </div>
-              <div class="sim-buttons">
-                <button class="btn-secondary" id="btn-toggle-sim">⏸️ 일시 정지</button>
-                <button class="btn-text" id="btn-reset-sim">시세 초기화 ↺</button>
-              </div>
-            </div>
-
-          </div>
-
-        </section>
-
-      </div>
-    </div> class="valuation-result-badge" id="val-result-badge">😐 적정</div>
-              <div class="roi-badge" id="val-roi-badge">+0.0%</div>
-            </div>
-            <div class="valuation-body">
-              <p class="valuation-msg" id="val-msg">내가 만든 가격과 현재가가 거의 동일합니다.</p>
-            </div>
-          </div>
-
-          <!-- Sharing & Actions -->
-          <div class="action-buttons-group">
-            <button class="btn-primary" id="btn-share-recipe">📋 레시피 복사하기</button>
-            <button class="btn-accent" id="btn-try-game">🎮 챌린지 퀴즈 게임</button>
-          </div>
-
         </div>
 
-      </section>
+        <div class="ranking-filter-bar">
+          <!-- 업종 필터 -->
+          <select id="ranking-sector-filter" class="ranking-select">
+            <option value="all">📊 전체 업종</option>
+            <option value="반도체">🔬 반도체</option>
+            <option value="IT/인터넷">💻 IT/인터넷</option>
+            <option value="2차전지">🔋 2차전지</option>
+            <option value="자동차">🚗 자동차</option>
+            <option value="제약/바이오">💊 제약/바이오</option>
+            <option value="금융/은행">🏦 금융/은행</option>
+            <option value="철강/소재">⚙️ 철강/소재</option>
+            <option value="화학/소재">🧪 화학/소재</option>
+            <option value="유통/상사/건설">🏗️ 유통/상사/건설</option>
+            <option value="보험">🛡️ 보험</option>
+            <option value="엔터테인먼트">🎬 엔터테인먼트</option>
+            <option value="기타">📦 기타</option>
+          </select>
+          <!-- 시장 필터 -->
+          <div class="market-pill-group">
+            <button class="market-pill active" data-market="all">전체</button>
+            <button class="market-pill" data-market="KOSPI">코스피</button>
+            <button class="market-pill" data-market="KOSDAQ">코스닥</button>
+          </div>
+        </div>
+      </div>
 
-    </main>
+      <!-- 메인 랭킹 레이아웃 -->
+      <div class="ranking-main-layout">
 
-    <!-- Footer -->
-    <footer class="app-footer-info">
-      <p>© 2026 Stock Mixer Labs. 모든 데이터 처리는 PC 로컬 메모리 내에서 안전하게 구동됩니다.</p>
-    </footer>
+        <!-- 랭킹 리스트 (전체 150개 한번에) -->
+        <section class="ranking-list-full">
+          <!-- 집계 스탯 바 -->
+          <div class="ranking-stat-strip">
+            <div class="stat-chip"><span>🏢</span><strong id="stat-total-count">150</strong><small>개 종목</small></div>
+            <div class="stat-chip"><span>💰</span><strong id="stat-total-mcap">-</strong><small>총 시총</small></div>
+            <div class="stat-chip"><span>📈</span><strong id="stat-up-count">-</strong><small>상승</small></div>
+            <div class="stat-chip"><span>📉</span><strong id="stat-down-count">-</strong><small>하락</small></div>
+          </div>
 
+          <!-- 테이블 헤더 -->
+          <div class="rank-list-header">
+            <div class="rl-col rl-rank">순위</div>
+            <div class="rl-col rl-name">종목명</div>
+            <div class="rl-col rl-change">등락률</div>
+            <div class="rl-col rl-mcap">시가총액</div>
+            <div class="rl-col rl-action">선택</div>
+          </div>
+
+          <!-- 스크롤 가능한 전체 리스트 -->
+          <div class="rank-list-scroll" id="rank-list-scroll">
+            <div id="rank-list-body">
+              <!-- JS가 동적으로 150개 행 생성 -->
+            </div>
+          </div>
+
+          <!-- 하단 통계 및 인라인 컨트롤 -->
+          <div class="ranking-bottom-bar">
+            <span id="ranking-filter-info">전체 150개 종목 표시 중</span>
+            <div class="sim-inline-controls">
+              <button class="btn-sim-toggle-mini" id="btn-toggle-sim">⏸️ 일시정지</button>
+              <input type="range" id="sim-speed-range" min="500" max="5000" value="1500" step="500" title="시뮬레이션 속도">
+              <span class="sim-speed-badge-mini" id="sim-speed-badge">1.5초</span>
+            </div>
+            <button class="btn-text" id="btn-reset-sim">시세 초기화 ↺</button>
+          </div>
+        </section>
+      </div>
+  </div>
+
+  <!-- MODAL: Kiwoom API 연동 설정 -->
+  <div class="modal-overlay" id="kiwoom-modal">
+    <div class="modal-content kiwoom-modal-content">
+      <button class="modal-close" id="btn-close-kiwoom">×</button>
+      <h2 class="modal-title">🔌 Kiwoom REST API 연동 설정</h2>
+      <div class="modal-body">
+
+        <!-- 연동 상태 카드 -->
+        <div class="kiwoom-status-card" id="kiwoom-status-card">
+          <div class="kiwoom-status-row">
+            <div class="kiwoom-status-indicator" id="kiwoom-status-indicator">
+              <div class="status-pulse-dot disconnected" id="kiwoom-pulse-dot"></div>
+              <div>
+                <div class="kiwoom-status-title" id="kiwoom-status-title">프록시 서버 미연결</div>
+                <div class="kiwoom-status-desc" id="kiwoom-status-desc">아래 단계에 따라 서버를 시작하세요</div>
+              </div>
+            </div>
+            <button class="btn-test-connect" id="btn-test-connect">🔄 연결 테스트</button>
+          </div>
+          <div class="kiwoom-mode-badge" id="kiwoom-mode-badge">-</div>
+        </div>
+
+        <!-- 서버 시작 안내 -->
+        <div class="kiwoom-guide-section">
+          <h3>📋 프록시 서버 시작 방법</h3>
+          <div class="kiwoom-steps">
+            <div class="kiwoom-step">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <div class="step-title">터미널/PowerShell 열기</div>
+                <div class="step-desc">Stock Mixer 폴더에서 PowerShell을 엽니다</div>
+              </div>
+            </div>
+            <div class="kiwoom-step">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <div class="step-title">서버 시작 명령어 실행</div>
+                <code class="step-code" id="server-cmd">node server.js</code>
+                <button class="btn-copy-cmd" onclick="copyToClipboard('node server.js')">📋 복사</button>
+              </div>
+            </div>
+            <div class="kiwoom-step">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <div class="step-title">연결 확인</div>
+                <div class="step-desc">위의 '연결 테스트' 버튼을 눌러 연결을 확인합니다</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 실시간 연동 설정 -->
+        <div class="kiwoom-guide-section">
+          <h3>🔑 실시간 API 연동 (선택사항)</h3>
+          <p class="kiwoom-guide-desc">키움증권 REST API 키를 설정하면 실제 실시간 주가를 수신합니다. 키 없이도 Mock 모드로 작동합니다.</p>
+          <div class="kiwoom-api-form">
+            <div class="form-row">
+              <label>App Key</label>
+              <input type="password" id="input-app-key" placeholder="키움 앱키 입력" autocomplete="off">
+            </div>
+            <div class="form-row">
+              <label>Secret Key</label>
+              <input type="password" id="input-secret-key" placeholder="키움 시크릿키 입력" autocomplete="off">
+            </div>
+            <p class="kiwoom-key-note">⚠️ 키는 브라우저 localStorage에만 저장되며, 외부로 전송되지 않습니다.<br>실제 사용 시 .env 파일에 직접 입력하는 방법을 권장합니다.</p>
+          </div>
+        </div>
+
+        <!-- 실시간 연동 토글 -->
+        <div class="kiwoom-live-toggle-row">
+          <div>
+            <div class="live-toggle-title">🔴 실시간 가격 연동</div>
+            <div class="live-toggle-desc" id="live-toggle-desc">서버 연결 후 활성화됩니다</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-live-price" disabled>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <!-- MODAL: Help Guide -->
@@ -490,107 +462,27 @@
     </div>
   </div>
 
-  <!-- MODAL: Hall of Fame (Rankings & Game Challenge) -->
-  <div class="modal-overlay" id="rankings-modal">
-    <div class="modal-content">
-      <button class="modal-close" id="btn-close-rankings">×</button>
-      <h2 class="modal-title">🏆 적정 주가 예측 챌린지 퀴즈</h2>
-      <div class="modal-body">
-        
-        <div class="game-container" id="game-container">
-          <!-- Game Start View -->
-          <div id="game-start-view" class="game-view active">
-            <p class="game-intro">랜덤으로 출제되는 기업의 실제 현재 마진과 시가총액 비율을 고려하여, 시장이 부여한 **실제 PER**을 알아맞혀보세요! 오차가 적을수록 높은 점수를 획득합니다.</p>
-            <div class="game-rules">
-              <h4>🎮 게임 규칙</h4>
-              <ul>
-                <li>총 3문제가 출제됩니다.</li>
-                <li>기업 정보를 보고 적정하다고 생각하는 PER 슬라이더를 조작해 정답을 외칩니다.</li>
-                <li>실제 주가(시가총액)에 매겨진 실시간 PER와의 격차에 따라 점수가 산정됩니다!</li>
-              </ul>
-            </div>
-            <button class="btn-accent btn-large" id="btn-start-game">챌린지 도전하기 🚀</button>
-          </div>
-
-          <!-- Game Play View -->
-          <div id="game-play-view" class="game-view">
-            <div class="game-progress">
-              <span id="game-step">문제 1 / 3</span>
-              <span id="game-score">점수: 0점</span>
-            </div>
-            
-            <div class="game-question-card">
-              <h3 id="q-stock-name">네이버</h3>
-              <p id="q-stock-desc">포털 및 쇼핑 등 플랫폼 서비스 제공사</p>
-              
-              <div class="q-stats-grid">
-                <div class="q-stat">
-                  <span>현재 주가</span>
-                  <strong id="q-stock-price">180,000원</strong>
-                </div>
-                <div class="q-stat">
-                  <span>매출액</span>
-                  <strong id="q-stock-revenue">9.6조 원</strong>
-                </div>
-                <div class="q-stat">
-                  <span>영업이익률</span>
-                  <strong id="q-stock-opm">15%</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="game-input-area">
-              <div class="game-input-header">
-                <label>이 회사의 실제 PER는 몇 배일까요?</label>
-                <div class="game-input-val" id="game-per-val">20배</div>
-              </div>
-              <input type="range" id="game-slider-per" min="1" max="80" value="20" step="1">
-            </div>
-
-            <button class="btn-primary btn-large" id="btn-submit-answer">정답 제출 🎯</button>
-          </div>
-
-          <!-- Game Result View -->
-          <div id="game-result-view" class="game-view">
-            <div class="game-result-header">
-              <span class="trophy-emoji">🏆</span>
-              <h2>챌린지 완료!</h2>
-              <h3 id="final-score-text">최종 점수: 250점</h3>
-            </div>
-            
-            <div class="score-evaluation" id="score-evaluation">
-              훌륭합니다! 주식 가치 평가에 대한 감이 아주 뛰어납니다.
-            </div>
-
-            <div class="ranking-leaderboard">
-              <h4>🔥 실시간 랭킹 (로컬)</h4>
-              <ol class="ranking-list" id="local-rankings-list">
-                <li><span>1. 가치투자달인</span> <strong>290점</strong></li>
-                <li><span>2. 여의도워렌버핏</span> <strong>275점</strong></li>
-                <li><span>3. 삼전주주</span> <strong>240점</strong></li>
-              </ol>
-            </div>
-
-            <div class="game-action-buttons">
-              <button class="btn-accent" id="btn-replay-game">다시 도전 🔄</button>
-              <button class="btn-secondary" id="btn-exit-game">로비로 이동</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
     <!-- Toast Notification -->
-    <div class="toast" id="toast">레시피가 클립보드에 성공적으로 복사되었습니다! 🧪</div>
+  <div class="toast" id="toast">레시피가 클립보드에 성공적으로 복사되었습니다! 🧪</div>
 
-    <!-- Phone Home Indicator -->
-    <div class="phone-home-indicator"></div>
-  </div>
+  <!-- App Navigation Tabs (하단 이동) -->
+  <nav class="app-tabs">
+    <button class="tab-btn active" data-tab="mixer-tab">
+      <span class="tab-icon">🧪</span>
+      <span class="tab-label">레시피 믹서</span>
+    </button>
+    <button class="tab-btn" data-tab="ranking-tab">
+      <span class="tab-icon">🏆</span>
+      <span class="tab-label">시총 150 랭킹전</span>
+    </button>
+  </nav>
 
-  <!-- Scripts -->
-  <script src="data.js"></script>
-  <script src="app.js"></script>
+  <!-- Phone Home Indicator -->
+  <div class="phone-home-indicator"></div>
+</div>
+
+<!-- Scripts -->
+<script src="data.js?v=5"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
